@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"text/template"
 
 	"github.com/julienschmidt/httprouter"
@@ -38,6 +39,7 @@ func main() {
 	router := httprouter.New()
 	router.GET("/", Homepage)
 	router.GET("/healthy", Healthy)
+	router.GET("/d/:path", Default)
 	router.ServeFiles("/public/*filepath", http.Dir("web/public"))
 
 	fmt.Printf("Starting server on port: %d\n", *port)
@@ -49,6 +51,15 @@ func main() {
 
 func Homepage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	executeTemplate(w, "index.html", map[string]interface{}{"Title": "home"})
+}
+
+func Default(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	templateName := lowercaseFirstChar(p.ByName("path"))
+	executeTemplate(w, templateName+".html", map[string]interface{}{"Title": templateName})
+}
+
+func lowercaseFirstChar(str string) string {
+	return strings.ToLower(string(str[0])) + str[1:]
 }
 
 func executeTemplate(w http.ResponseWriter, t string, d map[string]interface{}) error {
