@@ -55,7 +55,11 @@ func Homepage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Default(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	templateName := lowercaseFirstChar(p.ByName("path"))
-	executeTemplate(w, templateName+".html", map[string]interface{}{"Title": templateName})
+	templateFile := templateName
+	if !strings.HasSuffix(templateFile, ".html") {
+		templateFile = templateFile + ".html"
+	}
+	executeTemplate(w, templateFile, map[string]interface{}{"Title": templateName})
 }
 
 func lowercaseFirstChar(str string) string {
